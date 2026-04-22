@@ -521,7 +521,7 @@
 
     <div class="form-respondent-selector">
       <button class="form-r-btn" id="btn-student" onclick="switchRespondent('student')">
-        <span class="r-icon">👤</span>本人（弟）<span class="r-sub">全11問</span>
+        <span class="r-icon">👤</span>俊希<span class="r-sub">全11問</span>
       </button>
       <button class="form-r-btn" id="btn-father" onclick="switchRespondent('father')">
         <span class="r-icon">👨</span>父<span class="r-sub">全11問</span>
@@ -646,7 +646,7 @@
         const block = ta.closest('.form-q-block');
         const labelEl = block.querySelector('.form-q-label');
         answers.push({
-          respondent: currentRespondent === 'student' ? '本人（弟）' : '父',
+          respondent: currentRespondent === 'student' ? '俊希' : '父',
           question: ta.getAttribute('data-q') + ' — ' + labelEl.textContent.replace(/Q\d+\.\s*/, '').trim(),
           answer: ta.value.trim()
         });
