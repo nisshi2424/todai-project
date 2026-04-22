@@ -878,8 +878,8 @@
     }
 
     try {
-      const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+          try {
+      await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
       document.getElementById('successOverlay').classList.add('show');
     } catch (e) {
       let text = '【共通テスト対策 AI効率化プロジェクト — ヒアリング回答】\n\n';
