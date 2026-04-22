@@ -869,17 +869,13 @@
     btn.textContent = '⏳ 送信中…'; btn.disabled = true;
     const payload = { timestamp: new Date().toISOString(), answers: answers };
 
-    if (SCRIPT_URL.includes('★')) {
-      let text = '【共通テスト対策 AI効率化プロジェクト — ヒアリング回答】\n\n';
-      answers.forEach(a => { text += '[' + a.respondent + '] ' + a.question + '\n→ ' + a.answer + '\n\n'; });
-      try { await navigator.clipboard.writeText(text); alert('送信先URLが未設定のため、回答をクリップボードにコピーしました。\nLINEやメールに貼り付けて送信してください。'); }
-      catch(e) { prompt('以下をコピーして送信してください：', text); }
-      btn.textContent = '📤 回答を送信する'; btn.disabled = false; return;
-    }
-
     try {
-          try {
-      await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
+      });
       document.getElementById('successOverlay').classList.add('show');
     } catch (e) {
       let text = '【共通テスト対策 AI効率化プロジェクト — ヒアリング回答】\n\n';
@@ -892,6 +888,7 @@
 
   function closeOverlay() { document.getElementById('successOverlay').classList.remove('show'); }
 </script>
+
 
 </body>
 </html>
