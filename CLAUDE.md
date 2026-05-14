@@ -18,6 +18,47 @@ todai-project/
 
 There is no build system, no package manager, no dependencies, and no server-side code. Everything is self-contained in `index.html`.
 
+## HTML Document Structure (top to bottom)
+
+```
+<head>  Google Fonts link + single <style> block
+<body>
+  #passwordGate     fixed overlay shown on load; hidden after correct password
+  .ai-topbar        sticky banner crediting Claude/Anthropic
+  SLIDE 1: COVER    cover slide
+  SLIDE 2: WHY AI   AI capability stats
+  SLIDE 3: PROBLEM  problem statement
+  SLIDE 4: B→A      before/after comparison
+  SLIDE 5: VISION   knowledge-search-engine concept demo
+  SLIDE 6: HOW      5-step workflow diagram
+  SLIDE 7: SCOPE    subject priority table
+  SLIDE 8: OUTPUT   output format options (grid)
+  SLIDE 9: COST     cost & timeline cards
+  SLIDE 10: INPUT   transition slide leading to the form
+  SLIDE 11: CLOSING next-steps guide
+  SLIDE 12: RESPOND inline feedback form (俊希 / 父)
+  #successOverlay   fixed overlay shown on successful submit
+  <script>          all JavaScript — two separate <script> blocks
+                    (checkPw is in the first; everything else in the second)
+```
+
+## Slide Map
+
+| # | Label in HTML | Japanese heading | Key component classes |
+|---|---|---|---|
+| 1 | COVER | AIで過去問を丸裸にする。 | `.cover`, `.ai-fact-strip`, `.cover-meta` |
+| 2 | WHY AI | この資料を作ったAIの実力を知ってほしい。 | `.iq-compare-bar`, `.why-ai-grid` |
+| 3 | PROBLEM | 共通テスト対策の9割は、力技だ。 | `.big-msg`, `.stat-row` |
+| 4 | BEFORE→AFTER | 同じ時間で、圧倒的な差がつく。 | `.compare`, `.compare-old`, `.compare-new` |
+| 5 | VISION | つくるのは、知識の検索エンジン。 | `.demo-box`, `.demo-entry` |
+| 6 | HOW IT WORKS | AIが、5つのステップで解析する。 | `.flow-vertical`, `.flow-item` |
+| 7 | SCOPE | まずは共通テストから。 | `.memo-box`, `.scope-table` |
+| 8 | OUTPUT | 出力は、勉強スタイルに合わせて選べる。 | `.output-grid`, `.output-card` |
+| 9 | COST | すでに手の届くところにある。 | `.cost-row`, `.cost-card` |
+| 10 | NEXT STEP | ここからは、二人の情報が必要だ。 | `.big-msg`, `.stat-row` (reused) |
+| 11 | NOTE | 回答が揃い次第、すぐに動き出す。 | `.closing-guide` |
+| 12 | RESPOND | 回答はここから。 | `.form-section` (full form) |
+
 ## Tech Stack
 
 | Layer | Choice |
@@ -45,6 +86,34 @@ There is no build system, no package manager, no dependencies, and no server-sid
 - Form submission uses `fetch()` with `mode: 'no-cors'` to the Google Apps Script URL
 - Fallback: if fetch fails, the serialized answers are copied to the clipboard via `navigator.clipboard`
 - Progress bar updates on every `input` event via event delegation on `document`
+
+### JavaScript Functions
+
+| Function | Sync | Description |
+|---|---|---|
+| `checkPw()` | sync | Validates `#pwInput` against hardcoded password; hides `#passwordGate` on success |
+| `switchRespondent(who)` | sync | Shows/hides `#form-student` or `#form-father`; toggles `.active` on selector buttons; calls `updateProgress()` |
+| `updateProgress()` | sync | Counts filled `<textarea>` elements in the active form; sets `#formProgress` width as a percentage |
+| `collectAnswers()` | sync | Walks `<textarea>` elements in the active form; returns array of `{respondent, question, answer}` objects (blanks skipped) |
+| `submitForm()` | **async** | Validates respondent + answers; POSTs payload to `SCRIPT_URL`; shows `#successOverlay` on success; clipboard fallback on error |
+| `closeOverlay()` | sync | Removes `.show` class from `#successOverlay` |
+
+### Key Element IDs
+
+| ID | Purpose |
+|---|---|
+| `passwordGate` | Full-screen password overlay (`display:none` after auth) |
+| `pwInput` | Password `<input>` — value compared in `checkPw()` |
+| `pwError` | Error message shown on wrong password |
+| `formProgress` | Progress bar `<div>` — `width` set as `%` string |
+| `btn-student` | Respondent selector button — toggled `.active` class |
+| `btn-father` | Respondent selector button — toggled `.active` class |
+| `form-prompt` | "回答者を選んでください" placeholder (hidden after selection) |
+| `form-student` | Entire 俊希 form section (`display:none` until selected) |
+| `form-father` | Entire 父 form section (`display:none` until selected) |
+| `form-submit-area` | Submit button wrapper (`display:none` until respondent selected) |
+| `submitBtn` | Submit `<button>` — disabled during fetch |
+| `successOverlay` | Full-screen success overlay — shown by adding `.show` class |
 
 ### Content Language
 - All user-visible text is in **Japanese**
@@ -84,6 +153,28 @@ Payload shape:
 ```
 
 The form shows only answered questions (skips blanks) to keep the payload lean.
+
+### Form Structure
+
+**俊希フォーム** (`#form-student`) — 11 questions in 4 groups:
+
+| Group | Questions |
+|---|---|
+| 勉強の現状について | Q1 現在の教材・勉強方法, Q2 過去問の進捗, Q3 しんどい場面 |
+| 赤本・過去問の使い方について | Q4 復習方法, Q5 出題傾向への気づき |
+| 今回のアイデアについて | Q6 欲しい機能・不要な機能, Q7 効率化したいこと, Q8 出力形式の希望（選択肢あり）, Q9 古典・漢文文献の活用方針 |
+| 使っているツール・環境について | Q10 使用デバイス, Q11 使用アプリ・サービス |
+
+**父フォーム** (`#form-father`) — 11 questions in 4 groups:
+
+| Group | Questions |
+|---|---|
+| メモの背景・意図について | Q1 AI解析を思いついたきっかけ, Q2 優先度設定の理由, Q3 出典文献を知りたい狙い, Q4 他に効率化したいこと |
+| 俊希の勉強の様子について | Q5 非効率に見える場面, Q6 苦手科目・分野, Q7 得意科目・分野 |
+| 学習計画・方針について | Q8 共テ vs 二次の時間配分, Q9 塾・予備校の有無, Q10 模試成績の現状 |
+| 今回の取り組みについて | Q11 期待・懸念 |
+
+Each question uses a `<textarea data-q="Q番号">` — the `data-q` attribute is read by `collectAnswers()` to build the question label in the payload.
 
 ## Development Workflow
 
