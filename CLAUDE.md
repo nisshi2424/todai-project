@@ -218,6 +218,35 @@ For layout/responsive testing, resize the browser window below 768 px or use bro
 
 For print/PDF testing, use browser print preview (`Ctrl+P` / `Cmd+P`).
 
+## Common Modification Recipes
+
+### Add a new slide
+1. Pick an insertion point between two existing `<!-- ===== SLIDE N: ... ===== -->` comment markers.
+2. Renumber the comment markers of subsequent slides so the sequence stays contiguous.
+3. Use `<div class="slide slide-dark">` or `slide-dark-2` to alternate the background.
+4. Inside, follow the existing pattern: `.slide-label` → `.section-head` (with `.highlight-inline` span) → `.section-sub` → content components → `.ai-stamp` at the bottom.
+5. Update the **Slide Map** table in this file.
+
+### Add a new question to a form
+1. Locate the appropriate `.form-q-group` (or add a new group with `.form-q-group-title`).
+2. Append a `.form-q-block` containing a `.form-q-label` (with `<span class="qn">Q番号.</span>` prefix) and a `<textarea data-q="Q番号" placeholder="...">`.
+3. The `data-q` attribute is what gets serialized — make it unique within that form (`Q12`, `Q13`, ...).
+4. `collectAnswers()` and `updateProgress()` pick the new textarea up automatically; no JS changes needed.
+5. Update the **Form Structure** tables in this file.
+
+### Change the password
+- Edit the literal in `checkPw()` (around line 553–559). Remember this is **client-side only** — never use it as a real secret.
+
+### Change the Google Apps Script endpoint
+- Edit the `SCRIPT_URL` constant in the second `<script>` block. The endpoint must accept a POST with `Content-Type: text/plain` (used because `mode: 'no-cors'` strips JSON content-type).
+
+### Tweak colors / theme
+- Edit the CSS custom properties on `:root` at the top of the `<style>` block. Most components reference tokens rather than hardcoded colors, so a single change cascades.
+- If you add a new design token, document it in the **CSS Design Tokens** table above.
+
+### Add a respondent (beyond 俊希 / 父)
+- Not currently supported by `switchRespondent(who)` — it only branches on `'student'` / `'father'`. Adding a third respondent requires updating `switchRespondent()`, `updateProgress()`, `collectAnswers()`, the button row, and the form container `display` toggle.
+
 ## Git Conventions
 
 Commit messages in this repo have been short imperative phrases:
