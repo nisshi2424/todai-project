@@ -74,11 +74,41 @@ There is no build system, no package manager, no dependencies, and no server-sid
 
 ### CSS Architecture
 - All styles live in a single `<style>` block in `<head>`
-- Design tokens are defined as CSS custom properties on `:root` (e.g., `--dark`, `--blue`, `--gradient-hero`)
+- Design tokens are defined as CSS custom properties on `:root` (see table below)
 - Dark theme only; color palette: near-black backgrounds, white text, blue/violet/cyan accents
 - Slide layout: `.slide` class with `page-break-after: always` for print/PDF support
+- Two slide background variants: `.slide-dark` (`--dark`) and `.slide-dark-2` (`--dark-2`)
 - Responsive breakpoint at `max-width: 768px` with a full mobile override section
-- Print styles at `@media print`
+- Print styles at `@media print`; page size forced to A4 via `@page { size: A4; margin: 0; }`
+
+### CSS Design Tokens (`:root`)
+
+| Variable | Value | Usage |
+|---|---|---|
+| `--dark` | `#09090b` | Default slide background |
+| `--dark-2` | `#0c0c10` | Alternate slide background |
+| `--dark-surface` | `#141418` | Raised surface background |
+| `--dark-card` | `rgba(255,255,255,0.04)` | Card / panel fill |
+| `--dark-border` | `rgba(255,255,255,0.08)` | Card / panel border |
+| `--white` | `#fafafa` | Primary text |
+| `--white-70` | `rgba(250,250,250,0.7)` | Secondary text |
+| `--white-50` | `rgba(250,250,250,0.5)` | Muted text |
+| `--white-30` | `rgba(250,250,250,0.3)` | Placeholder / label text |
+| `--white-10` | `rgba(250,250,250,0.10)` | Hairline tint |
+| `--blue` | `#3b82f6` | Primary accent |
+| `--violet` | `#8b5cf6` | Secondary accent |
+| `--cyan` | `#06b6d4` | Tertiary accent |
+| `--amber` | `#f59e0b` | Warning / highlight accent |
+| `--gradient-hero` | `135deg, cyan→blue→violet` | Headings, badges, key numbers |
+| `--gradient-blue` | `135deg, blue→violet` | Buttons, flow step numbers, progress bar |
+
+**Gradient text technique** — used extensively throughout the file for headings and accent text:
+```css
+background: var(--gradient-hero);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+```
 
 ### JavaScript Conventions
 - No modules, no imports — all functions are global
